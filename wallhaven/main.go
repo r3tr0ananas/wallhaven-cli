@@ -1,4 +1,4 @@
-package wallhaven
+package main
 
 import (
 	"log"
@@ -59,7 +59,7 @@ func init() {
 	}
 }
 
-func Main() {
+func main() {
 	var page string
 	var editor string
 

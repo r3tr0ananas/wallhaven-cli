@@ -1,4 +1,4 @@
-package wallhaven
+package main
 
 import (
 	"errors"
