@@ -59,7 +59,7 @@ func init() {
 	}
 }
 
-func main() {
+func Main() {
 	var page string
 	var editor string
 
