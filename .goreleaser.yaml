@@ -18,9 +18,7 @@ builds:
       - CGO_ENABLED=0
     goos:
       - linux
-      - windows
-      - darwin
-    main: ./src/
+    main: ./wallhaven/
     binary: wallhaven
 
 archives:

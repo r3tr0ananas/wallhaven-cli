@@ -1,8 +1,8 @@
 build:
-	go build -o wallhaven ./src/
+	go build -o wallhaven ./wallhaven/
 
 install:
 	cp wallhaven ~/.local/bin
 
 run:
-	go run ./src/ $(ARGS)
+	go run ./wallhaven/ $(ARGS)
