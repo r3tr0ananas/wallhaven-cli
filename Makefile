@@ -3,3 +3,6 @@ build:
 
 install:
 	cp wallhaven ~/.local/bin
+
+run:
+	go run ./src/ $(ARGS)

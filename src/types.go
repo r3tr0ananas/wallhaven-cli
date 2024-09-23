@@ -1,6 +1,7 @@
 package main
 
 type Config struct {
+	Editor     string `toml:"editor"`
 	SaveFolder string `toml:"save_folder"`
 }
 

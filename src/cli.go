@@ -28,7 +28,7 @@ func Preview(url string) error {
 	_, exists := os.LookupEnv("KITTY_WINDOW_ID")
 
 	if !exists {
-		return errors.New("You're not using kitty term")
+		return errors.New("You're not using kitty term") // add chafa support
 	}
 
 	cmd := exec.Command(

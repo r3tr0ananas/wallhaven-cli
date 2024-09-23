@@ -1,33 +1,30 @@
 package main
 
 import (
-	"errors"
-	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"os/user"
 	"path/filepath"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 )
 
 var cfg Config
-var page string
+var configFile string
 
 func init() {
 	var configPath string
-	var configFile string
 	var defaultWP string
 
 	if runtime.GOOS == "linux" {
 		user, err := user.Current()
 
 		if err != nil {
-			cli.Exit(err, 0)
+			os.Exit(0)
 		}
 
 		configPath = filepath.Join(user.HomeDir, ".config", "wallhaven-cli")
@@ -38,11 +35,12 @@ func init() {
 		os.MkdirAll(configPath, os.ModePerm)
 
 	} else if runtime.GOOS == "windows" {
-		// Add Windows Support
+		// Windows support ain't happening
 	}
 
 	if _, err := toml.DecodeFile(configFile, &cfg); err != nil {
 		cfg = Config{
+			Editor:     "nano",
 			SaveFolder: defaultWP,
 		}
 
@@ -62,92 +60,91 @@ func init() {
 }
 
 func main() {
-	app := &cli.App{
-		Name:     "wallhaven",
-		Usage:    "Search and download wallpapers from wallhaven",
-		Compiled: time.Now(),
-		Authors: []*cli.Author{
-			{
-				Name:  "r3tr0ananas",
-				Email: "ananas@ananas.moe",
-			},
-		},
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:  "page",
-				Value: "1",
-			},
-		},
-		Commands: []*cli.Command{
-			{
-				Name:      "search",
-				Aliases:   []string{"s"},
-				Usage:     "Search for wallpapers",
-				Args:      true,
-				ArgsUsage: "Query",
-				Action: func(ctx *cli.Context) error {
-					args := ctx.Args()
+	var page string
+	var editor string
 
-					if args.Len() == 0 {
-						return errors.New("No query given.")
-					}
+	var rootCmd = &cobra.Command{
+		Use:   "wallhaven",
+		Short: "Search and download wallpapers from wallhaven",
+	}
 
-					query := strings.Join(args.Slice(), " ")
+	var searchCmd = &cobra.Command{
+		Use:     "search [query]",
+		Aliases: []string{"s"},
+		Short:   "Search on wallhaven",
+		Args:    cobra.MinimumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			query := strings.Join(args, " ")
 
-					image_urls, err := Search(query)
+			image_urls, err := Search(query, page)
 
-					if err != nil {
-						return err
-					}
+			if err != nil {
+				return err
+			}
 
-					selection, err := ShowSelection(image_urls)
-					if err != nil {
-						return err
-					}
+			selection, err := ShowSelection(image_urls)
+			if err != nil {
+				return err
+			}
 
-					return DirectURL(selection)
-				},
-			},
-			{
-				Name:      "download",
-				Aliases:   []string{"d"},
-				Usage:     "Download wallpaper with given id",
-				Args:      true,
-				ArgsUsage: "ID",
-				Action: func(ctx *cli.Context) error {
-					args := ctx.Args()
-
-					if args.Len() == 0 {
-						return errors.New("You didn't give an ID.")
-					}
-
-					id := args.First()
-
-					if err := Download(id); err != nil {
-						return err
-					} else {
-						log.Println(fmt.Sprint("Image: ", id, " downloaded"))
-					}
-
-					return nil
-				},
-			},
-			{
-				Name:      "preview",
-				Args:      true,
-				ArgsUsage: "url",
-				Action: func(ctx *cli.Context) error {
-					args := ctx.Args()
-
-					url := args.First()
-
-					return Preview(url)
-				},
-			},
+			return DirectURL(selection)
 		},
 	}
 
-	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+	var downloadCmd = &cobra.Command{
+		Use:     "download [id]",
+		Aliases: []string{"d"},
+		Short:   "Download wallpaper with given id",
+		Args:    cobra.MinimumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			id := args[0]
+
+			if err := Download(id); err != nil {
+				return err
+			} else {
+				log.Printf("Image: %s downloaded", id)
+			}
+
+			return nil
+		},
 	}
+
+	var previewCmd = &cobra.Command{
+		Use:   "preview [url]",
+		Short: "Preview image.",
+		Args:  cobra.MinimumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			url := args[0]
+
+			return Preview(url)
+		},
+	}
+
+	var editCmd = &cobra.Command{
+		Use:   "edit",
+		Short: "Edit wallhaven's config.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if editor != "" {
+				cfg.Editor = editor
+			}
+
+			configCmd := exec.Command(cfg.Editor, configFile)
+
+			configCmd.Stdin = os.Stdin
+			configCmd.Stdout = os.Stdout
+			configCmd.Stderr = os.Stderr
+
+			return configCmd.Run()
+		},
+	}
+
+	searchCmd.Flags().StringVarP(&page, "page", "p", "1", "Get page.")
+	editCmd.Flags().StringVarP(&editor, "editor", "e", "", "Set custom editor.")
+
+	rootCmd.AddCommand(searchCmd)
+	rootCmd.AddCommand(downloadCmd)
+	rootCmd.AddCommand(previewCmd)
+	rootCmd.AddCommand(editCmd)
+
+	rootCmd.Execute()
 }

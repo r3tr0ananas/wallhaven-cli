@@ -50,7 +50,7 @@ func Download(id string) error {
 	return DirectURL(data.Data.FullImage)
 }
 
-func Search(query string) ([]string, error) {
+func Search(query string, page string) ([]string, error) {
 	var images SearchResult
 
 	base, err := url.Parse("https://wallhaven.cc/api/v1/search")
@@ -60,6 +60,7 @@ func Search(query string) ([]string, error) {
 
 	params := base.Query()
 	params.Set("q", query)
+	params.Set("page", page)
 	base.RawQuery = params.Encode()
 
 	request, err := http.NewRequest("GET", base.String(), nil)
@@ -75,6 +76,10 @@ func Search(query string) ([]string, error) {
 	defer r.Body.Close()
 
 	json.NewDecoder(r.Body).Decode(&images)
+
+	if len(images.Data) == 0 {
+		return nil, errors.New("No images found based on query")
+	}
 
 	image_urls := []string{}
 
