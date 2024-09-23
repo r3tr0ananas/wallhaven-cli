@@ -1,4 +1,4 @@
-package main
+package wallhaven
 
 type Config struct {
 	Editor     string `toml:"editor"`
