@@ -1,4 +1,4 @@
-module wallhaven-cli
+module github.com/r3tr0ananas/wallhaven-cli
 
 go 1.23.1
 
