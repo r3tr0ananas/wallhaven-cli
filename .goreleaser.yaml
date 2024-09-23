@@ -20,7 +20,7 @@ builds:
       - linux
       - windows
       - darwin
-    main: ./src/main.go
+    main: ./src/
     binary: wallhaven
 
 archives:
