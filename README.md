@@ -31,9 +31,19 @@ Once all prerequisites are met, you can install `wallhaven-cli` using one of the
 go install github.com/r3tr0ananas/wallhaven-cli/wallhaven@latest
 ```
 
-#### 2. Download the Latest Release
+#### 2. AUR
+
+You can install `wallhaven-cli` via the AUR:
+```bash
+yay -S wallhaven-cli
+```
+
+If you use a different AUR helper then replace `yay`.
+
+#### 3. Download the Latest Release
 
 Alternatively, you can download the [latest release](https://github.com/r3tr0ananas/wallhaven-cli/releases/latest) and move the binary to your `~/.local/bin` directory.
+
 
 ---
 
