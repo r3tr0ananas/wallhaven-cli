@@ -99,7 +99,7 @@ wallhaven download l35l5l
 > You can download multiple images at once:
 > 
 > ```bash
-> wallhaven collection l35l5l zy759g
+> wallhaven download l35l5l zy759g
 > ```
 ### Download Collections
 
