@@ -1,8 +1,15 @@
 package main
 
+type CategoriesType struct {
+	General bool `toml:"general"`
+	Anime   bool `toml:"anime"`
+	People  bool `toml:"people"`
+}
+
 type Config struct {
-	Editor     string `toml:"editor"`
-	SaveFolder string `toml:"save_folder"`
+	Editor     string         `toml:"editor"`
+	SaveFolder string         `toml:"save_folder"`
+	Categories CategoriesType `toml:"categories"`
 }
 
 type ResultItem struct {

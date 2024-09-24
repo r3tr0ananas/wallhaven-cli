@@ -44,6 +44,11 @@ func init() {
 		cfg = Config{
 			Editor:     "nano",
 			SaveFolder: defaultWP,
+			Categories: CategoriesType{
+				General: true,
+				Anime:   true,
+				People:  true,
+			},
 		}
 
 		log.Println("Default config folder:", cfg.SaveFolder)

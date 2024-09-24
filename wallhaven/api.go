@@ -66,18 +66,17 @@ func Search(query string, page string) ([]string, error) {
 		return nil, err
 	}
 
+	m := map[bool]int{false: 0, true: 1}
+
+	categories := fmt.Sprintf("%d%d%d", m[cfg.Categories.General], m[cfg.Categories.Anime], m[cfg.Categories.People])
+
 	params := base.Query()
 	params.Set("q", query)
 	params.Set("page", page)
+	params.Set("categories", categories)
 	base.RawQuery = params.Encode()
 
-	request, err := http.NewRequest("GET", base.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	client := &http.Client{}
-	r, err := client.Do(request)
+	r, err := http.Get(base.String())
 	if err != nil {
 		return nil, err
 	}
