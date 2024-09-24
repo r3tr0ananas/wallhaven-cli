@@ -1,11 +1,13 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"os"
 	"os/exec"
 	"os/user"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 
@@ -62,6 +64,7 @@ func init() {
 func main() {
 	var page string
 	var editor string
+	var downloadAll bool
 
 	var rootCmd = &cobra.Command{
 		Use:   "wallhaven",
@@ -82,28 +85,79 @@ func main() {
 				return err
 			}
 
-			selection, err := ShowSelection(image_urls)
+			selection, err := ShowSelection(image_urls, true)
 			if err != nil {
 				return err
 			}
 
-			return DirectURL(selection)
+			return DirectURL([]string{selection})
 		},
 	}
 
 	var downloadCmd = &cobra.Command{
-		Use:     "download [id]",
+		Use:     "download [id/ids]",
 		Aliases: []string{"d"},
 		Short:   "Download wallpaper with given id",
 		Args:    cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id := args[0]
-
-			if err := Download(id); err != nil {
+			if err := Download(args); err != nil {
 				return err
 			} else {
-				log.Printf("Image: %s downloaded", id)
+				log.Printf("Done downloading")
 			}
+
+			return nil
+		},
+	}
+
+	var collectionCmd = &cobra.Command{
+		Use:   "collection [username]",
+		Short: "Download images from a selection",
+		Args:  cobra.MinimumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			username := args[0]
+
+			collections, err := GetCollections(username)
+			if err != nil {
+				return err
+			}
+
+			selection, err := ShowSelection(collections, false)
+			if err != nil {
+				return err
+			}
+
+			re := regexp.MustCompile(`\(([^)]+)\)`)
+
+			matches := re.FindStringSubmatch(selection)
+
+			if len(matches) > 1 {
+				id := matches[1]
+
+				images, err := GetCollectionImages(username, id)
+				if err != nil {
+					return err
+				}
+
+				if !downloadAll {
+					selectedImage, err := ShowSelection(images, true)
+
+					images = []string{selectedImage}
+
+					if err != nil {
+						return err
+					}
+				}
+
+				err = DirectURL(images)
+				if err != nil {
+					return err
+				}
+			} else {
+				return errors.New("uh?")
+			}
+
+			log.Println("Done downloading the images/image")
 
 			return nil
 		},
@@ -140,9 +194,11 @@ func main() {
 
 	searchCmd.Flags().StringVarP(&page, "page", "p", "1", "Get page.")
 	editCmd.Flags().StringVarP(&editor, "editor", "e", "", "Set custom editor.")
+	collectionCmd.Flags().BoolVarP(&downloadAll, "all", "a", false, "Download all images from the collection.")
 
 	rootCmd.AddCommand(searchCmd)
 	rootCmd.AddCommand(downloadCmd)
+	rootCmd.AddCommand(collectionCmd)
 	rootCmd.AddCommand(previewCmd)
 	rootCmd.AddCommand(editCmd)
 

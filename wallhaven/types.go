@@ -8,14 +8,24 @@ type Config struct {
 type ResultItem struct {
 	ID        string `json:"id"`
 	FullImage string `json:"path"`
-	FileType  string `json:"file_type"`
 }
 
-type SearchResult struct {
-	Data []ResultItem `json:"data"`
+type Results struct {
+	Data  []ResultItem `json:"data"`
+	Error string       `json:"error"`
 }
 
 type Result struct {
 	Data  ResultItem `json:"data"`
 	Error string     `json:"error"`
+}
+
+type CollectionItem struct {
+	ID    int    `json:"id"`
+	Label string `json:"label"`
+}
+
+type CollectionList struct {
+	Data  []CollectionItem `json:"data"`
+	Error string           `json:"error"`
 }

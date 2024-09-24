@@ -8,10 +8,14 @@ import (
 	"strings"
 )
 
-func ShowSelection(items []string) (string, error) {
+func ShowSelection(items []string, preview bool) (string, error) {
 	input := strings.Join(items, "\n")
 
-	cmd := exec.Command("fzf", "--preview=wallhaven preview {}")
+	cmd := exec.Command("fzf")
+	if preview {
+		cmd.Args = append(cmd.Args, "--preview=wallhaven preview {}")
+	}
+
 	cmd.Stdin = strings.NewReader(input)
 
 	selected, err := cmd.Output()
