@@ -95,6 +95,12 @@ For example, to download a wallpaper with the ID `l35l5l`:
 wallhaven download l35l5l
 ```
 
+> [!Tip]
+> You can download multiple images at once:
+> 
+> ```bash
+> wallhaven collection l35l5l zy759g
+> ```
 ### Download Collections
 
 To download wallpapers from a user’s collection, use the following command:
@@ -105,10 +111,10 @@ wallhaven collection [username]
 
 > [!Tip]
 > To download all wallpapers from the collection, add the `-a` flag:
-
-```bash
-wallhaven collection [username] -a
-```
+> 
+> ```bash
+> wallhaven collection [username] -a
+> ```
 
 ---
 
