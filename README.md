@@ -49,8 +49,6 @@ Alternatively, you can download the [latest release](https://github.com/r3tr0ana
 
 ## 🚀 Usage
 
-Once installed, you can use `wallhaven-cli` directly from the command line.
-
 ### View Available Options
 
 To view all available commands and options, run:
@@ -83,11 +81,6 @@ For example:
 wallhaven search mashiro shiina
 ```
 
-> You also can get a different page:
-> ```bash
-> wallhaven search mashiro shiina --page 2
-> ```
-
 ### Download Wallpapers
 
 To download a specific wallpaper by its Wallhaven ID, use the following command:
@@ -101,6 +94,31 @@ For example, to download a wallpaper with the ID `l35l5l`:
 ```bash
 wallhaven download l35l5l
 ```
+
+### Download Collections
+
+To download wallpapers from a user’s collection, use the following command:
+
+```bash
+wallhaven collection [username]
+```
+
+> [!Tip]
+> To download all wallpapers from the collection, add the `-a` flag:
+
+```bash
+wallhaven collection [username] -a
+```
+
+---
+
+## 🛠️ Contribution
+
+Contributions are welcome! Feel free to submit issues or pull requests to help improve the project.
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
