@@ -112,26 +112,6 @@ wallhaven collection [username] -a
 
 ---
 
-## 🛠️ Contribution
-
-Contributions are welcome! Feel free to submit issues or pull requests to help improve the project.
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
-
-## 🛠️ Contribution
-
-Contributions are welcome! Feel free to submit issues or pull requests to help improve the project.
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
-
 ### Notes
 
 - Currently, `kitty` is mandatory as the terminal emulator, but future versions may support other terminals.
