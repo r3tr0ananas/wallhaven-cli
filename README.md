@@ -44,10 +44,11 @@ If you use a different AUR helper then replace `yay`.
 
 Alternatively, you can download the [latest release](https://github.com/r3tr0ananas/wallhaven-cli/releases/latest) and move the binary to your `~/.local/bin` directory.
 
-
 ---
 
 ## 🚀 Usage
+
+[!showcase](https://github.com/user-attachments/assets/00269470-a863-4ab4-b0a6-2f75a6e7206c)
 
 ### View Available Options
 
