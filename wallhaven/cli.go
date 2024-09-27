@@ -35,6 +35,12 @@ func Preview(url string) error {
 		return errors.New("You're not using kitty term") // add chafa support
 	}
 
+	if strings.Contains(url, "-->") {
+		return nil
+	} else if strings.Contains(url, "<--") {
+		return nil
+	}
+
 	cmd := exec.Command(
 		"kitty",
 		"icat",

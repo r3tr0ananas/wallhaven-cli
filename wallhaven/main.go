@@ -67,7 +67,7 @@ func init() {
 }
 
 func main() {
-	var page string
+	var page int
 	var editor string
 	var downloadAll bool
 
@@ -82,20 +82,35 @@ func main() {
 		Short:   "Search on wallhaven",
 		Args:    cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			var url string
+
 			query := strings.Join(args, " ")
 
-			image_urls, err := Search(query, page)
+			for url == "" {
+				selections := []string{"Next page -->", "Previous Page <--"}
+				image_urls, err := Search(query, page)
 
-			if err != nil {
-				return err
+				if err != nil {
+					return err
+				}
+
+				selections = append(selections, image_urls...)
+
+				selection, err := ShowSelection(selections, true)
+				if err != nil {
+					return err
+				}
+
+				if strings.Contains(selection, "-->") {
+					page++
+				} else if strings.Contains(selection, "<--") {
+					page--
+				} else {
+					url = selection
+				}
 			}
 
-			selection, err := ShowSelection(image_urls, true)
-			if err != nil {
-				return err
-			}
-
-			return DirectURL([]string{selection})
+			return DirectURL([]string{url})
 		},
 	}
 
@@ -197,7 +212,7 @@ func main() {
 		},
 	}
 
-	searchCmd.Flags().StringVarP(&page, "page", "p", "1", "Get page.")
+	searchCmd.Flags().IntVarP(&page, "page", "p", 1, "Get page.")
 	editCmd.Flags().StringVarP(&editor, "editor", "e", "", "Set custom editor.")
 	collectionCmd.Flags().BoolVarP(&downloadAll, "all", "a", false, "Download all images from the collection.")
 

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -58,7 +59,7 @@ func Download(ids []string) error {
 	return DirectURL(urls)
 }
 
-func Search(query string, page string) ([]string, error) {
+func Search(query string, page int) ([]string, error) {
 	var images Results
 
 	base, err := url.Parse("https://wallhaven.cc/api/v1/search")
@@ -72,9 +73,11 @@ func Search(query string, page string) ([]string, error) {
 
 	params := base.Query()
 	params.Set("q", query)
-	params.Set("page", page)
+	params.Set("page", fmt.Sprint(page))
 	params.Set("categories", categories)
 	base.RawQuery = params.Encode()
+
+	log.Println(base.String())
 
 	r, err := http.Get(base.String())
 	if err != nil {
@@ -85,7 +88,7 @@ func Search(query string, page string) ([]string, error) {
 	json.NewDecoder(r.Body).Decode(&images)
 
 	if len(images.Data) == 0 {
-		return nil, errors.New("No images found based on query")
+		return nil, errors.New("No images found based on query or page")
 	}
 
 	image_urls := []string{}
