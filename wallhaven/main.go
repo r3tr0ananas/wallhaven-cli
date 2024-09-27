@@ -22,7 +22,7 @@ func init() {
 	var configPath string
 	var defaultWP string
 
-	if runtime.GOOS == "linux" {
+	if runtime.GOOS == "linux" || runtime.GOOS == "freebsd" {
 		user, err := user.Current()
 
 		if err != nil {
