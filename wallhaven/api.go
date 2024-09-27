@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -76,8 +75,6 @@ func Search(query string, page int) ([]string, error) {
 	params.Set("page", fmt.Sprint(page))
 	params.Set("categories", categories)
 	base.RawQuery = params.Encode()
-
-	log.Println(base.String())
 
 	r, err := http.Get(base.String())
 	if err != nil {
