@@ -26,7 +26,9 @@ func DirectURL(url []string) error {
 
 		file := filepath.Join(cfg.SaveFolder, FileName)
 
-		if err := os.WriteFile(file, bytes, os.ModePerm); err != nil {
+		perm := os.FileMode(0644)
+
+		if err := os.WriteFile(file, bytes, perm); err != nil {
 			return errors.New("Failed to save image.")
 		}
 	}
