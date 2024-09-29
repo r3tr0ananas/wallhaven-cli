@@ -12,7 +12,11 @@ import (
 	"strings"
 )
 
-func DirectURL(url []string) error {
+func DirectURL(url []string, folder *string) error {
+	if folder == nil {
+		folder = &cfg.SaveFolder
+	}
+
 	for _, v := range url {
 		image, err := http.Get(v)
 		if err != nil {
@@ -24,7 +28,7 @@ func DirectURL(url []string) error {
 		SplitUrl := strings.Split(v, "/")
 		FileName := SplitUrl[len(SplitUrl)-1]
 
-		file := filepath.Join(cfg.SaveFolder, FileName)
+		file := filepath.Join(*folder, FileName)
 
 		perm := os.FileMode(0644)
 
@@ -57,7 +61,7 @@ func Download(ids []string) error {
 		urls = append(urls, data.Data.FullImage)
 	}
 
-	return DirectURL(urls)
+	return DirectURL(urls, nil)
 }
 
 func Search(query string, page int) ([]string, error) {

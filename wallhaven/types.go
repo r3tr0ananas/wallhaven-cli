@@ -9,6 +9,7 @@ type CategoriesType struct {
 type Config struct {
 	Editor     string         `toml:"editor"`
 	SaveFolder string         `toml:"save_folder"`
+	TmpFolder  string         `toml:"tmp_folder"`
 	Categories CategoriesType `toml:"categories"`
 }
 

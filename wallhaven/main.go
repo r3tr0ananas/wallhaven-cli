@@ -21,6 +21,7 @@ var configFile string
 func init() {
 	var configPath string
 	var defaultWP string
+	var defaultTmp string
 
 	if runtime.GOOS == "linux" || runtime.GOOS == "freebsd" {
 		user, err := user.Current()
@@ -32,9 +33,11 @@ func init() {
 		configPath = filepath.Join(user.HomeDir, ".config", "wallhaven-cli")
 		configFile = filepath.Join(configPath, "config.toml")
 		defaultWP = filepath.Join(user.HomeDir, "Pictures", "wallpapers")
+		defaultTmp = filepath.Join("/tmp", "wallhaven-cli")
 
 		os.MkdirAll(defaultWP, os.ModePerm)
 		os.MkdirAll(configPath, os.ModePerm)
+		os.MkdirAll(defaultTmp, os.ModePerm)
 
 	} else if runtime.GOOS == "windows" {
 		// Windows support ain't happening
@@ -44,6 +47,7 @@ func init() {
 		cfg = Config{
 			Editor:     "nano",
 			SaveFolder: defaultWP,
+			TmpFolder:  defaultTmp,
 			Categories: CategoriesType{
 				General: true,
 				Anime:   true,
@@ -110,7 +114,7 @@ func main() {
 				}
 			}
 
-			return DirectURL([]string{url})
+			return DirectURL([]string{url}, nil)
 		},
 	}
 
@@ -169,7 +173,7 @@ func main() {
 					}
 				}
 
-				err = DirectURL(images)
+				err = DirectURL(images, nil)
 				if err != nil {
 					return err
 				}
