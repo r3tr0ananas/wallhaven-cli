@@ -14,13 +14,15 @@ Before installing `wallhaven-cli`, make sure your system meets the following req
 
 - **Supported platform**:  
   - Linux
+  - FreeBSD
 - **[Go](https://go.dev/)**:  
   Required to build this project from the source.
 - **[fzf](https://github.com/junegunn/fzf?tab=readme-ov-file#installation)**:  
   Used for the selection menu. This is **required**.
-- **[kitty](https://github.com/kovidgoyal/kitty)**:  
-  Currently, `kitty` is **required** as the terminal emulator.
-
+- **[chafa](https://hpjansson.org/chafa/)**  
+  Used for displaying images in your terminal. This is **required** if you're not using the `kitty` terminal.
+- **[kitty](https://github.com/kovidgoyal/kitty)**  
+  `kitty` is **optional**.
 ### Installing
 
 Once all prerequisites are met, you can install `wallhaven-cli` using one of the following methods:
@@ -118,7 +120,3 @@ wallhaven collection [username]
 > ```
 
 ---
-
-### Notes
-
-- Currently, `kitty` is mandatory as the terminal emulator, but future versions may support other terminals.
