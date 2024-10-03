@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,152 +11,137 @@ import (
 	"strings"
 )
 
-func DirectURL(url []string, folder *string) error {
+func DLSave(url string, folder *string) error {
 	if folder == nil {
-		folder = &cfg.SaveFolder
+		folder = &config.SaveFolder
 	}
 
-	for _, v := range url {
-		image, err := http.Get(v)
-		if err != nil {
-			return errors.New("Failed to GET Request the image.")
-		}
+	request, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf("Error while doing a GET request to download the image: %v", err)
+	}
 
-		bytes, err := io.ReadAll(image.Body)
+	image, ioError := io.ReadAll(request.Body)
+	if ioError != nil {
+		return fmt.Errorf("Error while reading image: %v", image)
+	}
 
-		SplitUrl := strings.Split(v, "/")
-		FileName := SplitUrl[len(SplitUrl)-1]
+	urlSplit := strings.Split(url, "/")
+	name := urlSplit[len(urlSplit)-1]
 
-		file := filepath.Join(*folder, FileName)
+	file := filepath.Join(*folder, name)
 
-		perm := os.FileMode(0644)
+	perm := os.FileMode(0644)
 
-		if err := os.WriteFile(file, bytes, perm); err != nil {
-			return errors.New("Failed to save image.")
-		}
+	if err := os.WriteFile(file, image, perm); err != nil {
+		return fmt.Errorf("Error while writing file to %v: %v", file, err)
 	}
 
 	return nil
 }
 
-func Download(ids []string) error {
-	var urls []string
-	for _, id := range ids {
-		var data Result
-		requestUrl := fmt.Sprintf("https://wallhaven.cc/api/v1/w/%s", id)
-
-		r, err := http.Get(requestUrl)
-
-		if err != nil {
-			return err
-		}
-		defer r.Body.Close()
-
-		json.NewDecoder(r.Body).Decode(&data)
-		if data.Error != "" {
-			return fmt.Errorf("An image with that ID \"%s\" doesn't exist. %v", id, data.Error)
-		}
-
-		urls = append(urls, data.Data.FullImage)
-	}
-
-	return DirectURL(urls, nil)
-}
-
-func Search(query string, page int) ([]string, error) {
-	var images Results
-
-	base, err := url.Parse("https://wallhaven.cc/api/v1/search")
+func SearchAPI(query string, page int) (ImagesResponse, error) {
+	var images ImagesResponse
+	url, err := url.Parse("https://wallhaven.cc/api/v1/search")
 	if err != nil {
-		return nil, err
+		return ImagesResponse{}, fmt.Errorf("huh?")
 	}
 
 	m := map[bool]int{false: 0, true: 1}
 
-	categories := fmt.Sprintf("%d%d%d", m[cfg.Categories.General], m[cfg.Categories.Anime], m[cfg.Categories.People])
+	categories := fmt.Sprintf(
+		"%d%d%d",
+		m[config.Searching.Categories.General],
+		m[config.Searching.Categories.Anime],
+		m[config.Searching.Categories.People],
+	)
 
-	params := base.Query()
-	params.Set("q", query)
-	params.Set("page", fmt.Sprint(page))
-	params.Set("categories", categories)
-	base.RawQuery = params.Encode()
+	params := url.Query()
+	params.Add("q", query)
+	params.Add("page", fmt.Sprint(page))
+	params.Add("categories", categories)
+	params.Add("order", config.Searching.Order)
+	params.Add("topRange", config.Searching.TopRange)
 
-	r, err := http.Get(base.String())
+	if config.Searching.AtLeast != "" {
+		params.Add("atleast", config.Searching.AtLeast)
+	}
+
+	if config.Searching.Resolutions != nil {
+		resolutions := strings.Join(config.Searching.Resolutions, ",")
+		params.Add("resolutions", resolutions)
+	}
+
+	if config.Searching.Ratios != nil {
+		ratios := strings.Join(config.Searching.Ratios, ",")
+		params.Add("ratios", ratios)
+	}
+
+	url.RawQuery = params.Encode()
+
+	response, err := http.Get(url.String())
 	if err != nil {
-		return nil, err
+		return ImagesResponse{}, err
 	}
-	defer r.Body.Close()
+	defer response.Body.Close()
 
-	json.NewDecoder(r.Body).Decode(&images)
-
-	if len(images.Data) == 0 {
-		return nil, errors.New("No images found based on query or page")
-	}
-
-	image_urls := []string{}
-
-	for _, element := range images.Data {
-		image_urls = append(image_urls, element.FullImage)
+	decodingError := json.NewDecoder(response.Body).Decode(&images)
+	if decodingError != nil {
+		return ImagesResponse{}, fmt.Errorf("Error while decoding json: %v", decodingError)
 	}
 
-	return image_urls, nil
+	return images, nil
 }
 
-func GetCollections(username string) ([]string, error) {
-	var collectionList CollectionList
+func DownloadAPI(id string) error {
+	var image ImageResponse
+	url := fmt.Sprintf("https://wallhaven.cc/api/v1/w/%v", id)
 
-	collectionURL := fmt.Sprintf("https://wallhaven.cc/api/v1/collections/%s", username)
-
-	r, err := http.Get(collectionURL)
-
+	response, err := http.Get(url)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	defer r.Body.Close()
+	defer response.Body.Close()
 
-	json.NewDecoder(r.Body).Decode(&collectionList)
-
-	if collectionList.Error != "" {
-		return nil, errors.New("This user doesn't exist.")
-	}
-
-	if len(collectionList.Data) == 0 {
-		return nil, errors.New("This user doesn't have any collection.")
+	decodingError := json.NewDecoder(response.Body).Decode(&image)
+	if decodingError != nil {
+		return fmt.Errorf("Error while decoding json: %v", decodingError)
 	}
 
-	collections := []string{}
+	return DLSave(image.Image.ImageURL, nil)
+}
 
-	for _, element := range collectionList.Data {
-		label := fmt.Sprintf("%s (%d)", element.Label, element.ID)
+func CollectionsAPI(username string) (CollectionsResponse, error) {
+	var collections CollectionsResponse
+	url := fmt.Sprintf("https://wallhaven.cc/api/v1/collections/%v", username)
 
-		collections = append(collections, label)
+	response, err := http.Get(url)
+	if err != nil {
+		return CollectionsResponse{}, err
+	}
+	defer response.Body.Close()
+
+	decodingError := json.NewDecoder(response.Body).Decode(&collections)
+	if decodingError != nil {
+		return CollectionsResponse{}, fmt.Errorf("Error while decoding json: %v", decodingError)
 	}
 
 	return collections, nil
 }
 
-func GetCollectionImages(username string, id string) ([]string, error) {
-	var results Results
+func CollectionAPI(username string, id string) (ImagesResponse, error) {
+	var images ImagesResponse
+	url := fmt.Sprintf("https://wallhaven.cc/api/v1/collections/%v/%v", username, id)
 
-	collectionURL := fmt.Sprintf("https://wallhaven.cc/api/v1/collections/%s/%s", username, id)
-
-	r, err := http.Get(collectionURL)
-
+	response, err := http.Get(url)
 	if err != nil {
-		return nil, err
+		return ImagesResponse{}, err
 	}
-	defer r.Body.Close()
+	defer response.Body.Close()
 
-	json.NewDecoder(r.Body).Decode(&results)
-
-	if results.Error != "" {
-		return nil, errors.New("There is no such ID.")
-	}
-
-	images := []string{}
-
-	for _, element := range results.Data {
-		images = append(images, element.FullImage)
+	decodingError := json.NewDecoder(response.Body).Decode(&images)
+	if decodingError != nil {
+		return ImagesResponse{}, fmt.Errorf("Error while decoding json: %v", decodingError)
 	}
 
 	return images, nil
