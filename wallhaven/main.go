@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/user"
@@ -52,11 +53,21 @@ func init() {
 				return
 			}
 
-			os.WriteFile(configPath, encodedData, os.ModePerm)
+			if err := os.WriteFile(configPath, encodedData, os.ModePerm); err != nil {
+				fmt.Print(err)
+				os.Exit(1)
+			}
 		}
 
-		os.MkdirAll(config.TempFolder, os.ModePerm)
-		os.MkdirAll(config.SaveFolder, os.ModePerm)
+		if err := os.MkdirAll(config.TempFolder, os.ModePerm); err != nil {
+			fmt.Print(err)
+			os.Exit(1)
+		}
+
+		if err := os.MkdirAll(config.SaveFolder, os.ModePerm); err != nil {
+			fmt.Print(err)
+			os.Exit(1)
+		}
 	} else {
 		log.Fatalf("Your os isn't supported: %v", runtime.GOOS)
 		return
@@ -64,7 +75,6 @@ func init() {
 }
 
 var page int
-var editor string
 var all bool
 
 func main() {
@@ -117,5 +127,8 @@ func main() {
 
 	rootCmd.AddCommand(searchCmd, downloadCmd, editCmd, collectionCmd, previewCmd)
 
-	rootCmd.Execute()
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Print(err)
+		os.Exit(1)
+	}
 }

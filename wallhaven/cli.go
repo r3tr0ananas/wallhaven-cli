@@ -121,7 +121,7 @@ func Collection(cmd *cobra.Command, args []string) error {
 	id := re.FindStringSubmatch(SelectedID)[1]
 
 	if all {
-		for true {
+		for {
 			images, err := CollectionAPI(username, id, page)
 			if err != nil {
 				return err
@@ -236,7 +236,10 @@ func Preview(cmd *cobra.Command, args []string) error {
 			url,
 		)
 	} else if path != "" {
-		DLSave(url, &config.TempFolder)
+		err := DLSave(url, &config.TempFolder)
+		if err != nil {
+			return err
+		}
 
 		SplitUrl := strings.Split(url, "/")
 		FileName := SplitUrl[len(SplitUrl)-1]
