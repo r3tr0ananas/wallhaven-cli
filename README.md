@@ -50,7 +50,7 @@ Alternatively, you can download the [latest release](https://github.com/r3tr0ana
 
 ## 🚀 Usage
 
-[!showcase](https://github.com/user-attachments/assets/00269470-a863-4ab4-b0a6-2f75a6e7206c)
+[!showcase](https://github.com/user-attachments/assets/42a0d02e-8897-40b1-b79c-ab9c9bb000f4)
 
 ### View Available Options
 
