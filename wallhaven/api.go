@@ -113,7 +113,7 @@ func DownloadAPI(id string) error {
 
 func CollectionsAPI(username string) (CollectionsResponse, error) {
 	var collections CollectionsResponse
-	url := fmt.Sprintf("https://wallhaven.cc/api/v1/collections/%v", username)
+	url := fmt.Sprintf("https://wallhaven.cc/api/v1/collections/%s", username)
 
 	response, err := http.Get(url)
 	if err != nil {
@@ -129,11 +129,22 @@ func CollectionsAPI(username string) (CollectionsResponse, error) {
 	return collections, nil
 }
 
-func CollectionAPI(username string, id string) (ImagesResponse, error) {
+func CollectionAPI(username string, id string, page int) (ImagesResponse, error) {
 	var images ImagesResponse
-	url := fmt.Sprintf("https://wallhaven.cc/api/v1/collections/%v/%v", username, id)
+	collectionURL, err := url.Parse(
+		fmt.Sprintf("https://wallhaven.cc/api/v1/collections/%s/%s", username, id),
+	)
 
-	response, err := http.Get(url)
+	if err != nil {
+		return ImagesResponse{}, nil
+	}
+
+	query := collectionURL.Query()
+	query.Add("page", fmt.Sprint(page))
+
+	collectionURL.RawQuery = query.Encode()
+
+	response, err := http.Get(collectionURL.String())
 	if err != nil {
 		return ImagesResponse{}, err
 	}

@@ -19,6 +19,7 @@ type SearchParams struct {
 type Config struct {
 	Editor     string       `toml:"editor"`
 	SaveFolder string       `toml:"save_folder"`
+	TempFolder string       `toml:"temp_folder"`
 	Searching  SearchParams `toml:"searching"`
 }
 
@@ -35,12 +36,16 @@ type Image struct {
 }
 
 type CollectionType struct {
-	ID    string `json:"id"`
+	ID    int    `json:"id"`
 	Label string `json:"label"`
 }
 
+type Meta struct {
+	LastPage int `json:"last_page"`
+}
+
 type CollectionsResponse struct {
-	Collections []CollectionType `json:"id"`
+	Collections []CollectionType `json:"data"`
 }
 
 type ImageResponse struct {
@@ -49,4 +54,5 @@ type ImageResponse struct {
 
 type ImagesResponse struct {
 	Images []Image `json:"data"`
+	Meta   Meta    `json:"meta"`
 }
