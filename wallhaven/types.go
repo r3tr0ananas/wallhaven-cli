@@ -6,34 +6,53 @@ type CategoriesType struct {
 	People  bool `toml:"people"`
 }
 
+type SearchParams struct {
+	Categories  CategoriesType `toml:"categories"`
+	Sorting     string         `toml:"sorting"`
+	Order       string         `toml:"order"`
+	TopRange    string         `toml:"top_range"`
+	AtLeast     string         `toml:"at_least"`
+	Resolutions []string       `toml:"resolutions"`
+	Ratios      []string       `toml:"ratios"`
+}
+
 type Config struct {
-	Editor     string         `toml:"editor"`
-	SaveFolder string         `toml:"save_folder"`
-	TmpFolder  string         `toml:"tmp_folder"`
-	Categories CategoriesType `toml:"categories"`
+	Editor     string       `toml:"editor"`
+	SaveFolder string       `toml:"save_folder"`
+	TempFolder string       `toml:"temp_folder"`
+	Searching  SearchParams `toml:"searching"`
 }
 
-type ResultItem struct {
-	ID        string `json:"id"`
-	FullImage string `json:"path"`
+type Tag struct {
+	Name string `json:"name"`
 }
 
-type Results struct {
-	Data  []ResultItem `json:"data"`
-	Error string       `json:"error"`
+type Image struct {
+	ImageID    string `json:"id"`
+	URL        string `json:"url"`
+	Resolution string `json:"resolution"`
+	ImageURL   string `json:"path"`
+	Tags       []Tag  `json:"tags"`
 }
 
-type Result struct {
-	Data  ResultItem `json:"data"`
-	Error string     `json:"error"`
-}
-
-type CollectionItem struct {
+type CollectionType struct {
 	ID    int    `json:"id"`
 	Label string `json:"label"`
 }
 
-type CollectionList struct {
-	Data  []CollectionItem `json:"data"`
-	Error string           `json:"error"`
+type Meta struct {
+	LastPage int `json:"last_page"`
+}
+
+type CollectionsResponse struct {
+	Collections []CollectionType `json:"data"`
+}
+
+type ImageResponse struct {
+	Image Image `json:"data"`
+}
+
+type ImagesResponse struct {
+	Images []Image `json:"data"`
+	Meta   Meta    `json:"meta"`
 }
