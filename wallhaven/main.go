@@ -109,7 +109,7 @@ func main() {
 	var editCmd = &cobra.Command{
 		Use:     "edit",
 		Aliases: []string{"e"},
-		Short:   "Edit the wallpaper-cli config.",
+		Short:   "Edit the wallhaven-cli config.",
 		RunE:    Edit,
 	}
 
