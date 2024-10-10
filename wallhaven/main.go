@@ -33,16 +33,6 @@ func init() {
 			os.Exit(1)
 		}
 
-		if err := os.MkdirAll(config.TempFolder, os.ModePerm); err != nil {
-			log.Fatalf("Failed to create temp folder %s: %v", config.TempFolder, err)
-			os.Exit(1)
-		}
-
-		if err := os.MkdirAll(config.SaveFolder, os.ModePerm); err != nil {
-			log.Fatalf("Failed to create save folder %s: %v", config.SaveFolder, err)
-			os.Exit(1)
-		}
-
 		if _, decodeError := toml.DecodeFile(configFile, &config); decodeError != nil {
 			config = Config{
 				Editor:     "nano",
@@ -74,6 +64,16 @@ func init() {
 				fmt.Print(err)
 				os.Exit(1)
 			}
+		}
+
+		if err := os.MkdirAll(config.TempFolder, os.ModePerm); err != nil {
+			log.Fatalf("Failed to create temp folder %s: %v", config.TempFolder, err)
+			os.Exit(1)
+		}
+
+		if err := os.MkdirAll(config.SaveFolder, os.ModePerm); err != nil {
+			log.Fatalf("Failed to create save folder %s: %v", config.SaveFolder, err)
+			os.Exit(1)
 		}
 	} else {
 		log.Fatalf("Your os isn't supported: %s", runtime.GOOS)
