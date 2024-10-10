@@ -14,7 +14,7 @@ import (
 )
 
 var config Config
-var configPath string
+var configFile string
 var re = regexp.MustCompile(`\(([^)]+)\)`)
 
 func init() {
@@ -25,9 +25,14 @@ func init() {
 			return
 		}
 
-		configPath = filepath.Join(usr.HomeDir, ".config", "wallhaven-cli", "config.toml")
+		configPath := filepath.Join(usr.HomeDir, ".config", "wallhaven-cli")
+		configFile = filepath.Join(configPath, "config.toml")
 
-		if _, decodeError := toml.DecodeFile(configPath, &config); decodeError != nil {
+		os.MkdirAll(configPath, os.ModePerm)
+		os.MkdirAll(config.TempFolder, os.ModePerm)
+		os.MkdirAll(config.SaveFolder, os.ModePerm)
+
+		if _, decodeError := toml.DecodeFile(configFile, &config); decodeError != nil {
 			config = Config{
 				Editor:     "nano",
 				SaveFolder: filepath.Join(usr.HomeDir, "Pictures", "wallpapers"),
@@ -53,23 +58,14 @@ func init() {
 				return
 			}
 
-			if err := os.WriteFile(configPath, encodedData, os.ModePerm); err != nil {
+			WriteError := os.WriteFile(configFile, encodedData, os.ModePerm)
+			if WriteError != nil {
 				fmt.Print(err)
 				os.Exit(1)
 			}
 		}
-
-		if err := os.MkdirAll(config.TempFolder, os.ModePerm); err != nil {
-			fmt.Print(err)
-			os.Exit(1)
-		}
-
-		if err := os.MkdirAll(config.SaveFolder, os.ModePerm); err != nil {
-			fmt.Print(err)
-			os.Exit(1)
-		}
 	} else {
-		log.Fatalf("Your os isn't supported: %v", runtime.GOOS)
+		log.Fatalf("Your os isn't supported: %s", runtime.GOOS)
 		return
 	}
 }

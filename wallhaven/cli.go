@@ -79,14 +79,14 @@ func Download(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		fmt.Printf("[download] %v", v)
+		fmt.Printf("[download] %s", v)
 	}
 
 	return nil
 }
 
 func Edit(cmd *cobra.Command, args []string) error {
-	command := exec.Command(config.Editor, configPath)
+	command := exec.Command(config.Editor, configFile)
 
 	command.Stdin = os.Stdin
 	command.Stdout = os.Stdout
@@ -137,7 +137,7 @@ func Collection(cmd *cobra.Command, args []string) error {
 					return err
 				}
 
-				fmt.Printf("[download] %v\r\n", v.ImageID)
+				fmt.Printf("[download] %s\r\n", v.ImageID)
 			}
 			if images.Meta.LastPage > page {
 				page++
@@ -260,7 +260,7 @@ func Preview(cmd *cobra.Command, args []string) error {
 	command.Stderr = os.Stderr
 
 	if err := command.Run(); err != nil {
-		return fmt.Errorf("failed to execute command: %v", err)
+		return fmt.Errorf("failed to execute command: %s", err)
 	}
 
 	if file != "" {
