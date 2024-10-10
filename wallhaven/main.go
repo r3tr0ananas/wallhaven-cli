@@ -28,9 +28,20 @@ func init() {
 		configPath := filepath.Join(usr.HomeDir, ".config", "wallhaven-cli")
 		configFile = filepath.Join(configPath, "config.toml")
 
-		os.MkdirAll(configPath, os.ModePerm)
-		os.MkdirAll(config.TempFolder, os.ModePerm)
-		os.MkdirAll(config.SaveFolder, os.ModePerm)
+		if err := os.MkdirAll(configPath, os.ModePerm); err != nil {
+			log.Fatalf("Failed to create config path %s: %v", configPath, err)
+			os.Exit(1)
+		}
+
+		if err := os.MkdirAll(config.TempFolder, os.ModePerm); err != nil {
+			log.Fatalf("Failed to create temp folder %s: %v", config.TempFolder, err)
+			os.Exit(1)
+		}
+
+		if err := os.MkdirAll(config.SaveFolder, os.ModePerm); err != nil {
+			log.Fatalf("Failed to create save folder %s: %v", config.SaveFolder, err)
+			os.Exit(1)
+		}
 
 		if _, decodeError := toml.DecodeFile(configFile, &config); decodeError != nil {
 			config = Config{
