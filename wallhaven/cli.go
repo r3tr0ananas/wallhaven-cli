@@ -68,7 +68,7 @@ func Search(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Printf("[download] %v", url)
+	fmt.Printf("[download] %v\n", url)
 	return nil
 }
 
