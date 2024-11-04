@@ -120,3 +120,6 @@ wallhaven collection [username]
 > ```
 
 ---
+
+> [!NOTE]
+> I use this project to learn golang. So don't expect the best golang code.
