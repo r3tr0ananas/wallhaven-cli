@@ -30,7 +30,7 @@ Once all prerequisites are met, you can install `wallhaven-cli` using one of the
 #### 1. Install via `go install`
 
 ```bash
-go install github.com/r3tr0ananas/wallhaven-cli/wallhaven/v2@latest
+go install github.com/r3tr0ananas/wallhaven-cli/v2/wallhaven@latest
 ```
 
 #### 2. AUR
